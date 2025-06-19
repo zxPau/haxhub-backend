@@ -1,4 +1,16 @@
 // Almacenamiento temporal (reemplaza por BD si deseas)
+export default async function handler(req, res) {
+  res.setHeader("Access-Control-Allow-Origin", "*"); // O usa tu dominio exacto
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  // Si es una preflight request, responde inmediatamente
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
+  // El resto de tu código...
+
 const codes = {};
 
 export default async function handler(req, res) {
