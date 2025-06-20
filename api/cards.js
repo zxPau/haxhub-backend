@@ -1,33 +1,20 @@
-const cards = {};
+// cards.js - Obtener carta por auth o Discord ID
+export default async function handler(req, res) {
+  const { id } = req.query;
+  if (!id) return res.status(400).json({ error: "Falta id" });
 
-export default function handler(req, res) {
-  // Permitir CORS
-  res.setHeader("Access-Control-Allow-Origin", "*"); // permite cualquier origen
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  const fs = require("fs");
+  const data = JSON.parse(fs.readFileSync("db.json"));
 
-  if (req.method === "OPTIONS") {
-    // Respuesta rápida a preflight
-    res.status(204).end();
-    return;
-  }
+  const result = data.vinculados[id] || Object.values(data.vinculados).find(u => u.auth === id);
+  if (!result) return res.status(404).json({ error: "No vinculado" });
 
-  if (req.method === "POST") {
-    const { id, nick, goals, assists, saves } = req.body;
-    if (!id) return res.status(400).json({ error: "Falta id" });
-
-    cards[id] = { nick, goals, assists, saves };
-    console.log(`Carta guardada: ${nick} (${id})`);
-
-    res.status(200).json({ status: "ok" });
-  } else if (req.method === "GET") {
-    const id = req.query.id;
-    if (!id || !cards[id]) {
-      return res.status(404).json({ error: "Carta no encontrada.." });
+  return res.status(200).json({
+    nick: result.nick,
+    stats: {
+      goles: 5, // Simulado (aquí deberías traer datos reales en el futuro)
+      asistencias: 3,
+      paradas: 1
     }
-    res.status(200).json(cards[id]);
-  } else {
-    res.setHeader("Allow", ["GET", "POST", "OPTIONS"]);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
-  }
+  });
 }
