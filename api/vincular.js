@@ -1,39 +1,14 @@
-import { codes } from "./codes.js";
+// POST: usuario de Discord quiere vincular
+// Body: { discordId, code }
 
-const vinculaciones = {}; // auth -> Discord ID (puedes guardar en BD)
+export default function handler(req, res) {
+  const { discordId, code } = req.body;
 
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).end("Method Not Allowed");
-  }
+  if (!code || !discordId) return res.status(400).json({ error: 'Datos faltantes' });
+  if (!db[code]) return res.status(404).json({ error: 'Código inválido' });
 
-  const { code, discordId, discordUsername } = req.body;
+  db[code].vinculado = true;
+  db[code].discordId = discordId;
 
-  if (!code || !discordId || !discordUsername) {
-    return res.status(400).json({ error: "Faltan datos" });
-  }
-
-  const vinculo = codes[code];
-  if (!vinculo) {
-    return res.status(400).json({ error: "Código inválido o expirado" });
-  }
-
-  vinculaciones[vinculo.auth] = {
-    discordId,
-    discordUsername,
-    nick: vinculo.nombre,
-    fecha: Date.now()
-  };
-
-  delete codes[code];
-
-  return res.status(200).json({
-    success: true,
-    data: {
-      auth: vinculo.auth,
-      nick: vinculo.nombre,
-      discordId,
-      discordUsername
-    }
-  });
+  return res.status(200).json({ message: 'Cuenta vinculada' });
 }
