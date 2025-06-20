@@ -1,23 +1,20 @@
-// POST: recibe carta del servidor headless
-// Body: { username, goles, asistencias, code }
-
 let db = {};
 
 export default function handler(req, res) {
   if (req.method === 'POST') {
     const { username, goles, asistencias, code } = req.body;
-    if (!code) return res.status(400).json({ error: 'Código requerido' });
+    if (!code || !username) return res.status(400).json({ error: 'Datos faltan' });
 
     db[code] = {
       username,
       goles,
       asistencias,
       vinculado: false,
-      discordId: null,
+      discordId: null
     };
 
-    return res.status(200).json({ message: 'Carta creada', code });
+    return res.status(200).json({ message: 'Carta registrada', code });
   }
 
-  return res.status(405).end();
+  res.status(405).end();
 }
