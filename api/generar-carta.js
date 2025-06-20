@@ -1,4 +1,14 @@
 export default async function handler(req, res) {
+  // Habilitar CORS
+  res.setHeader('Access-Control-Allow-Origin', '*'); // En producción limita el dominio
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Responder OPTIONS para preflight
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método no permitido' });
   }
@@ -10,7 +20,6 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Datos incompletos' });
   }
 
-  // Simulación de almacenamiento (puedes reemplazar por DB real)
   const carta = {
     username,
     goles,
@@ -19,7 +28,7 @@ export default async function handler(req, res) {
     creadaEn: new Date().toISOString()
   };
 
-  // Aquí podrías guardar en una DB como Firebase, MongoDB, PlanetScale, etc.
+  // Aquí podrías guardar en una DB real
   console.log("📥 Carta generada:", carta);
 
   return res.status(200).json({ success: true, carta });
